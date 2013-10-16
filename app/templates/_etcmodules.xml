@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <<%= namespace %>_<%= moduleName %>>
+            <active>true</active>
+            <codePool><%= codePool %></codePool>
+        </<%= namespace %>_<%= moduleName %>>
+    </modules>
+</config>

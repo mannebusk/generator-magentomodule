@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <<%= fullModuleName %>>
+            <version>0.1.0</version>
+        </<%= fullModuleName %>>
+    </modules>
+    <global>
+        <models>
+            <<%= moduleIdentifier %>>
+                <class><%= fullModuleName %>_Model</class>
+            </<%= moduleIdentifier %>>
+        </models>
+        <blocks>
+            <<%= moduleIdentifier %>>
+                <class><%= fullModuleName %>_Block</class>
+            </<%= moduleIdentifier %>>
+        </blocks>
+        <helpers>
+            <<%= moduleIdentifier %>>
+                <class><%= fullModuleName %>_Helper</class>
+            </<%= moduleIdentifier %>>
+        </helpers>
+    </global>
+    <% if (frontend) { %>
+    <frontend>
+        <% if (_.indexOf(frontend, 'layout') !== -1) { %>
+        <layout>
+            <updates>
+                <<%= moduleIdentifier %>>
+                    <file><%= moduleIdentifier %>.xml</file>
+                </<%= moduleIdentifier %>>
+            </updates>
+        </layout>
+        <% } %>
+        <% if (_.indexOf(frontend, 'controller') !== -1) { %>
+        <routers>
+            <<%= moduleIdentifier %>>
+                <use>standard</use>
+                <args>
+                    <module><%= fullModuleName %></module>
+                    <frontName><%= moduleName.toLowerCase() %></frontName>
+                </args>
+            </<%= moduleIdentifier %>>
+        </routers>
+        <% } %>
+    </frontend>
+    <% } %>
+</config>
