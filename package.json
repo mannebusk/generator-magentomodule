@@ -1,15 +1,16 @@
 {
   "name": "generator-magentomodule",
-  "version": "0.0.0",
-  "description": "A generator for Yeoman",
+  "version": "0.0.1",
+  "description": "A Yeoman generator for Magento modules.",
   "keywords": [
-    "yeoman-generator"
+    "yeoman-generator",
+    "magento"
   ],
   "homepage": "https://github.com/mannebusk/generator-magentomodule",
   "bugs": "https://github.com/mannebusk/generator-magentomodule/issues",
   "author": {
     "name": "Manne",
-    "email": "manne@fjb.se",
+    "email": "mannebusk@gmail.com",
     "url": "https://github.com/mannebusk"
   },
   "main": "app/index.js",
