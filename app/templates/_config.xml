@@ -21,6 +21,16 @@
                 <class><%= fullModuleName %>_Helper</class>
             </<%= moduleIdentifier %>>
         </helpers>
+        <% if (setup) { %>
+        <resources>
+            <<%= moduleIdentifier %>_setup>
+                <setup>
+                    <module><%= fullModuleName %></module>
+                    <class><%= fullModuleName %>_Model_Resource_Setup</class>
+                </setup>
+            </<%= moduleIdentifier %>_setup>
+        </resources>
+        <% } %>
     </global>
     <% if (frontend) { %>
     <frontend>
@@ -45,5 +55,31 @@
         </routers>
         <% } %>
     </frontend>
+    <% } %>
+    <% if (adminhtml) { %>
+    <adminhtml>
+        <% if (_.indexOf(frontend, 'layout') !== -1) { %>
+        <layout>
+            <updates>
+                <<%= moduleIdentifier %>>
+                    <file><%= moduleIdentifier %>.xml</file>
+                </<%= moduleIdentifier %>>
+            </updates>
+        </layout>
+        <% } %>
+    </adminhtml>
+        <% if (_.indexOf(frontend, 'controller') !== -1) { %>
+    <admin>
+        <routers>
+            <<%= moduleIdentifier %>>
+                <use>admin</use>
+                <args>
+                    <module><%= fullModuleName %></module>
+                    <frontName><%= moduleName.toLowerCase() %></frontName>
+                </args>
+            </<%= moduleIdentifier %>>
+        </routers>
+    </admin>
+        <% } %>
     <% } %>
 </config>

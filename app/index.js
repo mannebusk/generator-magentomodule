@@ -25,8 +25,8 @@ MagentomoduleGenerator.prototype.askFor = function askFor() {
     var prompts = [
     {
         type: 'input',
-            name: 'namespace',
-            message: 'What is your namespace?',
+        name: 'namespace',
+        message: 'What is your namespace?',
         default: 'Something'
     },
     {
@@ -38,7 +38,7 @@ MagentomoduleGenerator.prototype.askFor = function askFor() {
     {
         type: 'select',
         name: 'codePool',
-        message: 'What code pool are you going to stick your module in?',
+        message: 'What code pool are you going to stick your module in? (pardon my french ...)',
         choices: [
         {
             name: "Local Module",
@@ -53,8 +53,44 @@ MagentomoduleGenerator.prototype.askFor = function askFor() {
     },
     {
         type: 'checkbox',
+        name: 'global',
+        message: 'Need any templates for the general stuff?',
+        choices: [
+            {
+                name: "Template for Model",
+                value: 'model'
+            },
+            {
+                name: "Template for Block",
+                value: 'block'
+            },
+            {
+                name: "Helper",
+                value: 'helper'
+            }
+        ],
+        default: false
+    },
+    {
+        type: 'checkbox',
         name: 'frontend',
-        message: 'What frontend stuff do you require good sir?',
+        message: 'What frontend gadgets do you require good sir?',
+        choices: [
+            {
+                name: "Layout file",
+                value: 'layout'
+            },
+            {
+                name: "Controller",
+                value: 'controller'
+            }
+        ],
+        default: false
+    },
+    {
+        type: 'checkbox',
+        name: 'adminhtml',
+        message: 'What admin shizzle do you want?',
         choices: [
         {
             name: "Layout file",
@@ -66,7 +102,14 @@ MagentomoduleGenerator.prototype.askFor = function askFor() {
         }
         ],
         default: false
-    }
+    },
+    {
+        type: 'confirm',
+        name: 'setup',
+        message: 'Need a setup script?',
+        default: false
+    },
+
     ];
 
     this.prompt(prompts, function (props) {
@@ -76,7 +119,11 @@ MagentomoduleGenerator.prototype.askFor = function askFor() {
         this.namespace = props.namespace;
         this.moduleName = props.moduleName;
         this.codePool = props.codePool;
+        this.global = props.global;
         this.frontend = props.frontend;
+        this.adminhtml = props.adminhtml;
+        this.setup = props.setup;
+
 
         this.fullModuleName = props.namespace + '_' + props.moduleName;
         this.moduleIdentifier = props.namespace.toLowerCase() + props.moduleName.toLowerCase(); 
@@ -95,9 +142,25 @@ MagentomoduleGenerator.prototype.app = function app() {
     this.mkdir('app/code/' + this.codePool);
     this.mkdir('app/code/' + this.codePool + '/' + this.namespace);
     this.mkdir('app/code/' + this.codePool + '/' + this.namespace + '/' + this.moduleName);
-    this.mkdir(modulePath + 'Block');
-    this.mkdir(modulePath + 'Model');
-    this.mkdir(modulePath + 'Helper');
+
+    // Global
+    if (this.global.length) {
+        // Hepler
+        if (this.global.indexOf('helper') !== -1) {
+            this.mkdir(modulePath + 'Helper');
+            this.template('_helper.php', modulePath + 'Helper/Data.php');
+        }
+        // Model
+        if (this.global.indexOf('model') !== -1) {
+            this.mkdir(modulePath + 'Model');
+            this.template('_model.php', modulePath + 'Model/Mymodel.php');
+        }
+        // Block
+        if (this.global.indexOf('block') !== -1) {
+            this.mkdir(modulePath + 'Block');
+            this.template('_block.php', modulePath + 'Block/Myblock.php');
+        }
+    }
 
     // Frontend
     if (this.frontend.length) {
@@ -106,18 +169,40 @@ MagentomoduleGenerator.prototype.app = function app() {
             this.mkdir(modulePath + 'controllers');
             this.template('_frontcontroller.php', modulePath + 'controllers/IndexController.php');
         }
-        // Controller
+        // layout file
         if (this.frontend.indexOf('layout') !== -1) {
-            this.mkdir('app/design');
-            this.mkdir('app/design/frontend');
-            this.mkdir('app/design/frontend/base');
-            this.mkdir('app/design/frontend/base/default');
             this.mkdir('app/design/frontend/base/default/layout');
             var layoutPath = 'app/design/frontend/base/default/layout/';
 
             this.template('_frontlayout.xml', layoutPath + this.moduleIdentifier + '.xml');
         }
     }
+
+
+    // Admin
+    if (this.adminhtml.length) {
+        // Controller
+        if (this.adminhtml.indexOf('controller') !== -1) {
+            this.mkdir(modulePath + 'controllers/adminhtml');
+            this.template('_adminhtmlcontroller.php', modulePath + 'controllers/adminhtml/IndexController.php');
+        }
+        // Layout
+        if (this.adminhtml.indexOf('layout') !== -1) {
+            this.mkdir('app/design/adminhtml/default/default/layout');
+            var adminLayoutPath = 'app/design/adminhtml/default/default/layout/';
+            this.template('_adminhtmllayout.xml', adminLayoutPath + this.moduleIdentifier + '.xml');
+        }
+    }
+    
+    // Set up script
+    if (this.setup) {
+        var setupPath = modulePath + 'sql/' + this.moduleIdentifier + '_setup';
+        this.mkdir(setupPath);
+        this.mkdir(modulePath + 'Model/Resource');
+        this.template('_setup.php', setupPath + '/mysql4-install-0.1.0.php');
+        this.template('_setupresource.php', modulePath + 'Model/Resource/Setup.php');
+    }
+
 
 
     this.template('_etcmodules.xml', 'app/etc/modules/' + this.fullModulename + '.xml');
