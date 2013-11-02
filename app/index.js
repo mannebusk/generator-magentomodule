@@ -205,7 +205,7 @@ MagentomoduleGenerator.prototype.app = function app() {
 
 
 
-    this.template('_etcmodules.xml', 'app/etc/modules/' + this.fullModulename + '.xml');
+    this.template('_etcmodules.xml', 'app/etc/modules/' + this.fullModuleName + '.xml');
     this.template('_config.xml', modulePath + 'etc/config.xml');
     this.copy('_package.json', 'package.json');
 };
