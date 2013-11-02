@@ -27,18 +27,18 @@ MagentomoduleGenerator.prototype.askFor = function askFor() {
         type: 'input',
         name: 'namespace',
         message: 'What is your namespace?',
-        default: 'Something'
+        default: 'MyNamespace'
     },
     {
         type: 'input',
         name: 'moduleName',
-        message: 'What is the name of your epic magento module?',
+        message: 'What is the name of your Magento module?',
         default: 'MyModule'
     },
     {
         type: 'select',
         name: 'codePool',
-        message: 'What code pool are you going to stick your module in? (pardon my french ...)',
+        message: 'Which code pool are you going to stick your module in?',
         choices: [
         {
             name: "Local Module",
