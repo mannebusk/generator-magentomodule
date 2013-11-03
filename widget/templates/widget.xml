@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<widgets>
+    <<%= name.toLowerCase() %> type="<%= lowerModuleName %>/widget_<%= name.toLowerCase() %>" translate="name description" module="<%= fullModuleName %>">
+        <name>My New Widget</name>
+        <description>A mighty fine widget!<description>
+        <parameters>
+            <afield translate="label">
+                <visible>1</visible>
+                <required>1</required>
+                <label>A field</label>
+                <type>text</type>
+                <sort_order>10</sort_order>
+            </afield>
+        </parameters>
+    </<%= name.toLowerCase() %>>
+</widgets>

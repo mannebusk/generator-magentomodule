@@ -7,8 +7,27 @@ var yeoman = require('yeoman-generator');
 var MagentomoduleGenerator = module.exports = function MagentomoduleGenerator(args, options, config) {
     yeoman.generators.Base.apply(this, arguments);
 
+
     this.on('end', function () {
         this.installDependencies({ skipInstall: options['skip-install'] });
+
+        // Add widget via sub generator if selected
+        if (this.frontend.indexOf('widget') !== -1) {
+            this.invoke('magentomodule:widget', {
+              args: [{
+                  name: 'Mywidget',
+                  codePool: this.codePool,
+                  namespace: this.namespace,
+                  moduleName: this.moduleName,
+                  modulePath: this.modulePath
+              }],
+              options: {
+                options: {
+                    'skip-install': true,
+                }
+              }
+            });
+        }
     });
 
     this.pkg = JSON.parse(this.readFileAsString(path.join(__dirname, '../package.json')));
@@ -83,6 +102,10 @@ MagentomoduleGenerator.prototype.askFor = function askFor() {
             {
                 name: "Controller",
                 value: 'controller'
+            },
+            {
+                name: "Widget",
+                value: 'widget'
             }
         ],
         default: false
@@ -127,13 +150,14 @@ MagentomoduleGenerator.prototype.askFor = function askFor() {
 
         this.fullModuleName = props.namespace + '_' + props.moduleName;
         this.moduleIdentifier = props.namespace.toLowerCase() + props.moduleName.toLowerCase(); 
+        this.modulePath = 'app/code/' + this.codePool + '/' + this.namespace + '/' + this.moduleName + '/';
 
         cb();
     }.bind(this));
+
 };
 
 MagentomoduleGenerator.prototype.app = function app() {
-    var modulePath = 'app/code/' + this.codePool + '/' + this.namespace + '/' + this.moduleName + '/';
 
     this.mkdir('app');
     this.mkdir('app/etc');
@@ -147,18 +171,18 @@ MagentomoduleGenerator.prototype.app = function app() {
     if (this.global.length) {
         // Hepler
         if (this.global.indexOf('helper') !== -1) {
-            this.mkdir(modulePath + 'Helper');
-            this.template('_helper.php', modulePath + 'Helper/Data.php');
+            this.mkdir(this.modulePath + 'Helper');
+            this.template('_helper.php', this.modulePath + 'Helper/Data.php');
         }
         // Model
         if (this.global.indexOf('model') !== -1) {
-            this.mkdir(modulePath + 'Model');
-            this.template('_model.php', modulePath + 'Model/Mymodel.php');
+            this.mkdir(this.modulePath + 'Model');
+            this.template('_model.php', this.modulePath + 'Model/Mymodel.php');
         }
         // Block
         if (this.global.indexOf('block') !== -1) {
-            this.mkdir(modulePath + 'Block');
-            this.template('_block.php', modulePath + 'Block/Myblock.php');
+            this.mkdir(this.modulePath + 'Block');
+            this.template('_block.php', this.modulePath + 'Block/Myblock.php');
         }
     }
 
@@ -166,8 +190,8 @@ MagentomoduleGenerator.prototype.app = function app() {
     if (this.frontend.length) {
         // Controller
         if (this.frontend.indexOf('controller') !== -1) {
-            this.mkdir(modulePath + 'controllers');
-            this.template('_frontcontroller.php', modulePath + 'controllers/IndexController.php');
+            this.mkdir(this.modulePath + 'controllers');
+            this.template('_frontcontroller.php', this.modulePath + 'controllers/IndexController.php');
         }
         // layout file
         if (this.frontend.indexOf('layout') !== -1) {
@@ -176,6 +200,9 @@ MagentomoduleGenerator.prototype.app = function app() {
 
             this.template('_frontlayout.xml', layoutPath + this.moduleIdentifier + '.xml');
         }
+        // Widget
+        if (this.frontend.indexOf('widget') !== -1) {
+        }
     }
 
 
@@ -183,8 +210,8 @@ MagentomoduleGenerator.prototype.app = function app() {
     if (this.adminhtml.length) {
         // Controller
         if (this.adminhtml.indexOf('controller') !== -1) {
-            this.mkdir(modulePath + 'controllers/adminhtml');
-            this.template('_adminhtmlcontroller.php', modulePath + 'controllers/adminhtml/IndexController.php');
+            this.mkdir(this.modulePath + 'controllers/adminhtml');
+            this.template('_adminhtmlcontroller.php', this.modulePath + 'controllers/adminhtml/IndexController.php');
         }
         // Layout
         if (this.adminhtml.indexOf('layout') !== -1) {
@@ -196,17 +223,17 @@ MagentomoduleGenerator.prototype.app = function app() {
     
     // Set up script
     if (this.setup) {
-        var setupPath = modulePath + 'sql/' + this.moduleIdentifier + '_setup';
+        var setupPath = this.modulePath + 'sql/' + this.moduleIdentifier + '_setup';
         this.mkdir(setupPath);
-        this.mkdir(modulePath + 'Model/Resource');
+        this.mkdir(this.modulePath + 'Model/Resource');
         this.template('_setup.php', setupPath + '/mysql4-install-0.1.0.php');
-        this.template('_setupresource.php', modulePath + 'Model/Resource/Setup.php');
+        this.template('_setupresource.php', this.modulePath + 'Model/Resource/Setup.php');
     }
 
 
 
     this.template('_etcmodules.xml', 'app/etc/modules/' + this.fullModuleName + '.xml');
-    this.template('_config.xml', modulePath + 'etc/config.xml');
+    this.template('_config.xml', this.modulePath + 'etc/config.xml');
     this.copy('_package.json', 'package.json');
 };
 
