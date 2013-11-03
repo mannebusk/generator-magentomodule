@@ -11,6 +11,24 @@ var MagentomoduleGenerator = module.exports = function MagentomoduleGenerator(ar
     this.on('end', function () {
         this.installDependencies({ skipInstall: options['skip-install'] });
 
+        // Frontend Controller
+        if (this.frontend.indexOf('controller') !== -1) {
+            this.invoke('magentomodule:frontcontroller', {
+              args: [{
+                  name: 'IndexController',
+                  codePool: this.codePool,
+                  namespace: this.namespace,
+                  moduleName: this.moduleName,
+                  modulePath: this.modulePath
+              }],
+              options: {
+                options: {
+                    'skip-install': true,
+                }
+              }
+            });
+        }
+
         // Add widget via sub generator if selected
         if (this.frontend.indexOf('widget') !== -1) {
             this.invoke('magentomodule:widget', {
@@ -188,20 +206,12 @@ MagentomoduleGenerator.prototype.app = function app() {
 
     // Frontend
     if (this.frontend.length) {
-        // Controller
-        if (this.frontend.indexOf('controller') !== -1) {
-            this.mkdir(this.modulePath + 'controllers');
-            this.template('_frontcontroller.php', this.modulePath + 'controllers/IndexController.php');
-        }
         // layout file
         if (this.frontend.indexOf('layout') !== -1) {
             this.mkdir('app/design/frontend/base/default/layout');
             var layoutPath = 'app/design/frontend/base/default/layout/';
 
             this.template('_frontlayout.xml', layoutPath + this.moduleIdentifier + '.xml');
-        }
-        // Widget
-        if (this.frontend.indexOf('widget') !== -1) {
         }
     }
 
